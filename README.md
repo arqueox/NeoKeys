@@ -4,6 +4,10 @@
 
 # NeoKeys
 
+[![Downloads](https://img.shields.io/github/downloads/arqueox/NeoKeys/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/arqueox/NeoKeys/releases)
+[![Latest release](https://img.shields.io/github/v/release/arqueox/NeoKeys?style=for-the-badge&label=Vers%C3%A3o)](https://github.com/arqueox/NeoKeys/releases/latest)
+[![License](https://img.shields.io/github/license/arqueox/NeoKeys?style=for-the-badge)](LICENSE)
+
 Sons de teclado satisfatórios, exclusivamente para o **MacBook Neo**.
 
 NeoKeys é uma pequena app nativa para a barra de menus do macOS. Reproduz gravações de teclados físicos enquanto escreve, sem enviar ou guardar o que é digitado.
@@ -55,3 +59,5 @@ O código do NeoKeys é disponibilizado sob a licença MIT. As gravações inclu
 ## Estado do projeto
 
 O projeto é comunitário e direcionado apenas ao MacBook Neo. Relatórios de bugs e melhorias são bem-vindos através das Issues.
+
+As estatísticas públicas estão disponíveis no [painel do NeoKeys](https://arqueox.github.io/NeoKeys/).

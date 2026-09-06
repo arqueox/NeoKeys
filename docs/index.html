@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estatísticas públicas do NeoKeys para MacBook Neo">
+  <title>NeoKeys — Estatísticas</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: #f7f7ff; background: radial-gradient(circle at 20% 0%, #272278 0, #101135 34%, #070817 72%); }
+    main { width: min(940px, calc(100% - 36px)); margin: 0 auto; padding: 72px 0 48px; }
+    header { display: flex; align-items: center; gap: 22px; margin-bottom: 44px; }
+    header img { width: 92px; height: 92px; border-radius: 22px; filter: drop-shadow(0 14px 28px #0008); }
+    h1 { margin: 0 0 6px; font-size: clamp(2rem, 7vw, 3.8rem); letter-spacing: -.05em; }
+    header p { margin: 0; color: #b9bde4; font-size: 1.08rem; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .card { min-height: 140px; padding: 24px; border: 1px solid #ffffff1c; border-radius: 22px; background: linear-gradient(145deg, #ffffff12, #ffffff07); box-shadow: inset 0 1px #ffffff12, 0 20px 45px #0003; }
+    .label { color: #abb0db; font-size: .82rem; font-weight: 650; letter-spacing: .09em; text-transform: uppercase; }
+    .value { display: block; margin-top: 13px; font-size: 2.5rem; font-weight: 760; letter-spacing: -.04em; }
+    .release { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 16px; padding: 24px; border: 1px solid #785cff55; border-radius: 22px; background: linear-gradient(120deg, #4732b955, #119cc233); }
+    .release h2 { margin: 4px 0 0; font-size: 1.45rem; }
+    a.button { display: inline-block; padding: 12px 18px; border-radius: 13px; color: #10122c; background: #eef0ff; font-weight: 720; text-decoration: none; white-space: nowrap; }
+    footer { margin-top: 34px; color: #8d92ba; font-size: .9rem; line-height: 1.6; }
+    footer a { color: #bdc5ff; }
+    .error { color: #ffb7bf; }
+    @media (max-width: 720px) { .grid { grid-template-columns: repeat(2, 1fr); } .release { align-items: flex-start; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="icon.png" alt="Ícone NeoKeys">
+      <div><h1>NeoKeys</h1><p>Estatísticas públicas · exclusivamente para MacBook Neo</p></div>
+    </header>
+
+    <section class="grid" aria-label="Estatísticas do projeto">
+      <article class="card"><span class="label">Downloads</span><strong class="value" id="downloads">—</strong></article>
+      <article class="card"><span class="label">Stars</span><strong class="value" id="stars">—</strong></article>
+      <article class="card"><span class="label">Forks</span><strong class="value" id="forks">—</strong></article>
+      <article class="card"><span class="label">Issues abertas</span><strong class="value" id="issues">—</strong></article>
+    </section>
+
+    <section class="release">
+      <div><span class="label">Release mais recente</span><h2 id="release">A carregar…</h2></div>
+      <a class="button" id="download" href="https://github.com/arqueox/NeoKeys/releases/latest">Descarregar NeoKeys</a>
+    </section>
+
+    <footer>
+      <p id="status">Dados fornecidos pela API pública do GitHub.</p>
+      <p>Sem analytics, cookies ou identificação de visitantes. O GitHub não fornece a identidade de quem descarrega uma release pública. Consulte o <a href="https://github.com/arqueox/NeoKeys">código-fonte</a>.</p>
+    </footer>
+  </main>
+  <script>
+    const api = "https://api.github.com/repos/arqueox/NeoKeys";
+    const format = new Intl.NumberFormat("pt-PT");
+
+    async function load() {
+      try {
+        const [repoResponse, releasesResponse] = await Promise.all([
+          fetch(api, { headers: { Accept: "application/vnd.github+json" } }),
+          fetch(`${api}/releases`, { headers: { Accept: "application/vnd.github+json" } })
+        ]);
+        if (!repoResponse.ok || !releasesResponse.ok) throw new Error("API indisponível");
+        const repo = await repoResponse.json();
+        const releases = await releasesResponse.json();
+        const downloads = releases.flatMap(item => item.assets).reduce((sum, asset) => sum + asset.download_count, 0);
+        const latest = releases[0];
+
+        document.querySelector("#downloads").textContent = format.format(downloads);
+        document.querySelector("#stars").textContent = format.format(repo.stargazers_count);
+        document.querySelector("#forks").textContent = format.format(repo.forks_count);
+        document.querySelector("#issues").textContent = format.format(repo.open_issues_count);
+        document.querySelector("#release").textContent = latest?.name || "Sem releases";
+        if (latest?.assets?.[0]) document.querySelector("#download").href = latest.assets[0].browser_download_url;
+        document.querySelector("#status").textContent = `Atualizado em ${new Date().toLocaleString("pt-PT")}. Dados fornecidos pela API pública do GitHub.`;
+      } catch (error) {
+        document.querySelector("#status").className = "error";
+        document.querySelector("#status").textContent = "Não foi possível carregar as estatísticas. Tente novamente dentro de alguns minutos.";
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
