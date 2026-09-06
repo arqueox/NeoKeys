@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Estatísticas públicas do NeoKeys para MacBook Neo">
-  <title>NeoKeys — Estatísticas</title>
+  <meta name="description" content="Public statistics for NeoKeys on MacBook Neo">
+  <title>NeoKeys — Statistics</title>
   <style>
     :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
     * { box-sizing: border-box; }
@@ -31,29 +31,29 @@
   <main>
     <header>
       <img src="icon.png" alt="Ícone NeoKeys">
-      <div><h1>NeoKeys</h1><p>Estatísticas públicas · exclusivamente para MacBook Neo</p></div>
+      <div><h1>NeoKeys</h1><p>Public statistics · exclusively for MacBook Neo</p></div>
     </header>
 
-    <section class="grid" aria-label="Estatísticas do projeto">
+    <section class="grid" aria-label="Project statistics">
       <article class="card"><span class="label">Downloads</span><strong class="value" id="downloads">—</strong></article>
       <article class="card"><span class="label">Stars</span><strong class="value" id="stars">—</strong></article>
       <article class="card"><span class="label">Forks</span><strong class="value" id="forks">—</strong></article>
-      <article class="card"><span class="label">Issues abertas</span><strong class="value" id="issues">—</strong></article>
+      <article class="card"><span class="label">Open issues</span><strong class="value" id="issues">—</strong></article>
     </section>
 
     <section class="release">
-      <div><span class="label">Release mais recente</span><h2 id="release">A carregar…</h2></div>
-      <a class="button" id="download" href="https://github.com/arqueox/NeoKeys/releases/latest">Descarregar NeoKeys</a>
+      <div><span class="label">Latest release</span><h2 id="release">Loading…</h2></div>
+      <a class="button" id="download" href="https://github.com/arqueox/NeoKeys/releases/latest">Download NeoKeys</a>
     </section>
 
     <footer>
-      <p id="status">Dados fornecidos pela API pública do GitHub.</p>
-      <p>Sem analytics, cookies ou identificação de visitantes. O GitHub não fornece a identidade de quem descarrega uma release pública. Consulte o <a href="https://github.com/arqueox/NeoKeys">código-fonte</a>.</p>
+      <p id="status">Data provided by the public GitHub API.</p>
+      <p>No analytics, cookies, or visitor identification. GitHub does not disclose the identity of people who download public releases. View the <a href="https://github.com/arqueox/NeoKeys">source code</a>.</p>
     </footer>
   </main>
   <script>
     const api = "https://api.github.com/repos/arqueox/NeoKeys";
-    const format = new Intl.NumberFormat("pt-PT");
+    const format = new Intl.NumberFormat("en-US");
 
     async function load() {
       try {
@@ -71,12 +71,12 @@
         document.querySelector("#stars").textContent = format.format(repo.stargazers_count);
         document.querySelector("#forks").textContent = format.format(repo.forks_count);
         document.querySelector("#issues").textContent = format.format(repo.open_issues_count);
-        document.querySelector("#release").textContent = latest?.name || "Sem releases";
+        document.querySelector("#release").textContent = latest?.name || "No releases";
         if (latest?.assets?.[0]) document.querySelector("#download").href = latest.assets[0].browser_download_url;
-        document.querySelector("#status").textContent = `Atualizado em ${new Date().toLocaleString("pt-PT")}. Dados fornecidos pela API pública do GitHub.`;
+        document.querySelector("#status").textContent = `Updated ${new Date().toLocaleString("en-US")}. Data provided by the public GitHub API.`;
       } catch (error) {
         document.querySelector("#status").className = "error";
-        document.querySelector("#status").textContent = "Não foi possível carregar as estatísticas. Tente novamente dentro de alguns minutos.";
+        document.querySelector("#status").textContent = "Statistics could not be loaded. Please try again in a few minutes.";
       }
     }
     load();

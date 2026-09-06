@@ -1,11 +1,11 @@
-# Política de privacidade
+# Privacy policy
 
-NeoKeys funciona inteiramente no dispositivo.
+NeoKeys runs entirely on your device.
 
-- Não recolhe, guarda ou transmite o texto escrito.
-- Não possui analytics, telemetria, anúncios ou serviços de terceiros.
-- Não estabelece ligações de rede.
-- Recebe apenas códigos físicos de teclas através de um `CGEventTap` de leitura para selecionar e reproduzir o som correspondente.
-- As preferências de volume, perfil, ativação e início de sessão são guardadas localmente pelo macOS.
+- It does not collect, store, or transmit anything you type.
+- It contains no analytics, telemetry, advertising, or third-party services.
+- It does not establish network connections.
+- It receives only physical key codes through a read-only `CGEventTap`, solely to select and play the corresponding sound.
+- Sound profile, volume, enabled state, and launch-at-login preferences are stored locally by macOS.
 
-A permissão de **Monitorização de entrada** é necessária exclusivamente para reproduzir sons enquanto escreve noutras aplicações.
+The **Input Monitoring** permission is required only so NeoKeys can play sounds while you type in other applications.

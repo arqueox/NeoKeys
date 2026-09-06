@@ -5,43 +5,43 @@
 # NeoKeys
 
 [![Downloads](https://img.shields.io/github/downloads/arqueox/NeoKeys/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/arqueox/NeoKeys/releases)
-[![Latest release](https://img.shields.io/github/v/release/arqueox/NeoKeys?style=for-the-badge&label=Vers%C3%A3o)](https://github.com/arqueox/NeoKeys/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/arqueox/NeoKeys?style=for-the-badge&label=Version)](https://github.com/arqueox/NeoKeys/releases/latest)
 [![License](https://img.shields.io/github/license/arqueox/NeoKeys?style=for-the-badge)](LICENSE)
 
-Sons de teclado satisfatórios, exclusivamente para o **MacBook Neo**.
+Satisfying keyboard sounds, built exclusively for the **MacBook Neo**.
 
-NeoKeys é uma pequena app nativa para a barra de menus do macOS. Reproduz gravações de teclados físicos enquanto escreve, sem enviar ou guardar o que é digitado.
+NeoKeys is a small native macOS menu bar app that plays recordings of physical keyboards as you type. It never stores or transmits what you type.
 
-> Compatibilidade oficial: MacBook Neo `Mac17,5`, macOS 14 ou posterior. MacBook Air, MacBook Pro, iMac, Mac mini e outros modelos não são suportados.
+> Official compatibility: MacBook Neo `Mac17,5`, macOS 14 or later. MacBook Air, MacBook Pro, iMac, Mac mini, and other Mac models are not supported.
 
-## Funcionalidades
+## Features
 
-- App discreta na barra de menus, sem ícone na Dock
-- **Cherry Real:** 12 gravações de teclas físicas
-- **Máquina de escrever real:** sons distintos para teclas normais, Espaço, Return e Backspace
-- Perfis adicionais Butterfly, Thock, Clicky, Creamy, Typewriter e Soft
-- Reprodução sobreposta para acompanhar escrita rápida
-- Volume, ativação e perfil guardados entre sessões
-- Opção para abrir ao iniciar sessão
-- Funcionamento totalmente local, sem analytics nem ligação à Internet
+- Discreet menu bar app with no Dock icon
+- **Cherry Real:** 12 recordings of physical key presses
+- **Real Typewriter:** distinct sounds for regular keys, Space, Return, and Backspace
+- Additional Butterfly, Thock, Clicky, Creamy, Typewriter, and Soft profiles
+- Overlapping playback that keeps up with fast typing
+- Persistent sound profile, volume, and enabled state
+- Optional launch at login
+- Fully local operation with no analytics or network access
 
-## Instalar
+## Installation
 
-1. Descarregue `NeoKeys.zip` na página [Releases](../../releases/latest).
-2. Descompacte e mova `NeoKeys.app` para `/Applications`.
-3. Abra a app. Por ser uma build comunitária sem notarização, poderá ser necessário clicar com o botão direito e escolher **Abrir** na primeira execução.
-4. Autorize em **Definições do Sistema → Privacidade e Segurança → Monitorização de entrada**.
-5. Feche e volte a abrir a app se o macOS o solicitar.
+1. Download `NeoKeys.zip` from the [latest release](../../releases/latest).
+2. Extract it and move `NeoKeys.app` to `/Applications`.
+3. Open the app. This is a community build without Apple notarization, so you may need to right-click it and select **Open** the first time.
+4. Grant access under **System Settings → Privacy & Security → Input Monitoring**.
+5. Quit and reopen the app if requested by macOS.
 
-O menu deverá indicar **Deteção global ativa**. Use **Testar som** para confirmar a saída de áudio.
+The menu should display **Global detection active**. Use **Test sound** to verify your audio output.
 
-## Privacidade
+## Privacy
 
-NeoKeys usa um `CGEventTap` em modo exclusivamente de leitura para receber o código físico de cada tecla e escolher um som. Não reconstrói palavras, não guarda teclas, não utiliza rede e não recolhe dados. Consulte [PRIVACY.md](PRIVACY.md).
+NeoKeys uses a read-only `CGEventTap` to receive each key's physical code and select a matching sound. It does not reconstruct words, store keystrokes, use the network, or collect data. See [PRIVACY.md](PRIVACY.md).
 
-## Compilar
+## Build from source
 
-Requer as Command Line Tools do Xcode e Swift 6 ou posterior.
+Requires Xcode Command Line Tools and Swift 6 or later.
 
 ```sh
 git clone https://github.com/arqueox/NeoKeys.git
@@ -50,14 +50,14 @@ chmod +x build-app.sh
 ./build-app.sh
 ```
 
-A aplicação será criada em `dist/NeoKeys.app`.
+The application will be created at `dist/NeoKeys.app`.
 
-## Sons e licenças
+## Sounds and licenses
 
-O código do NeoKeys é disponibilizado sob a licença MIT. As gravações incluídas mantêm as respetivas licenças CC0 e MIT. Consulte [Resources/Sounds/ATTRIBUTION.md](Resources/Sounds/ATTRIBUTION.md) antes de redistribuir os assets.
+NeoKeys source code is released under the MIT License. Bundled recordings retain their respective CC0 and MIT licenses. Review [Resources/Sounds/ATTRIBUTION.md](Resources/Sounds/ATTRIBUTION.md) before redistributing the audio assets.
 
-## Estado do projeto
+## Project status
 
-O projeto é comunitário e direcionado apenas ao MacBook Neo. Relatórios de bugs e melhorias são bem-vindos através das Issues.
+NeoKeys is a community project designed exclusively for the MacBook Neo. Bug reports and contributions are welcome through GitHub Issues.
 
-As estatísticas públicas estão disponíveis no [painel do NeoKeys](https://arqueox.github.io/NeoKeys/).
+View live public statistics on the [NeoKeys dashboard](https://arqueox.github.io/NeoKeys/).

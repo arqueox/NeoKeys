@@ -2,8 +2,8 @@
 
 ## 1.3 — 2026-09-06
 
-- Adicionadas gravações reais do teclado Cherry KC 1000.
-- Adicionada máquina de escrever real com sons específicos por grupo de teclas.
-- Substituída a captura global por `CGEventTap` em modo de leitura.
-- Adicionado perfil Butterfly, diagnóstico de áudio e estado da captura global.
-- Adicionado ícone original e verificação explícita do MacBook Neo.
+- Added real Cherry KC 1000 keyboard recordings.
+- Added a real typewriter profile with sounds for different key groups.
+- Replaced global input capture with a read-only `CGEventTap`.
+- Added the Butterfly profile, audio diagnostics, and global capture status.
+- Added an original app icon and explicit MacBook Neo model verification.
