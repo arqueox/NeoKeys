@@ -1,5 +1,13 @@
 # Sound recordings and licenses
 
+## Pain Mode
+
+Fifteen human vocal strain, hurt, pain, and jump recordings from **15 vocal male strain/hurt/pain/jump sounds**, recorded by qubodup.
+
+- Source: https://opengameart.org/content/15-vocal-male-strainhurtpainjump-sounds
+- License: CC0 1.0 / Public Domain
+- Changes: the 15 FLAC recordings were converted to mono 44.1 kHz WAV and renamed by keyboard action.
+
 ## Cherry Real
 
 Twelve individual keypress recordings from **Keyboard Soundpack #1 — Typing and Single Keystrokes**, recorded on a Cherry KC 1000 keyboard with a Shure SM7B by unicaegames.

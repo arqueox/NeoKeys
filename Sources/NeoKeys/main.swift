@@ -103,7 +103,7 @@ enum SoundProfile: String, CaseIterable {
     }
 
     var isRecorded: Bool {
-        self == .mechanicalReal || self == .typewriterReal
+        self == .mechanicalReal || self == .typewriterReal || self == .pain
     }
 }
 
@@ -130,11 +130,11 @@ final class SoundEngine {
             players.append(player)
         }
         for profile in SoundProfile.allCases where !profile.isRecorded {
-            let variationCount = profile == .pain ? 9 : 6
-            buffers[profile] = (0..<variationCount).compactMap { makeBuffer(profile: profile, variation: $0) }
+            buffers[profile] = (0..<6).compactMap { makeBuffer(profile: profile, variation: $0) }
         }
         loadRecordedProfile(.mechanicalReal, folder: "Mechanical")
         loadRecordedProfile(.typewriterReal, folder: "Typewriter")
+        loadRecordedProfile(.pain, folder: "Pain")
         engine.prepare()
         startEngine()
     }
@@ -155,21 +155,11 @@ final class SoundEngine {
         let player = players[nextPlayer]
         nextPlayer = (nextPlayer + 1) % players.count
         let index: Int
-        if profile == .pain {
-            switch keyCode {
-            case 36, 76: index = Int.random(in: 6..<min(9, choices.count)) // Return / keypad Enter: scream
-            case 49: index = min(3, choices.count - 1)                    // Space: low groan
-            case 51, 117: index = min(4, choices.count - 1)               // Delete: relieved sigh
-            case 56, 60, 57: index = min(5, choices.count - 1)            // Shift / Caps Lock: protest
-            default: index = Int.random(in: 0..<min(3, choices.count))    // Small, varied "ow"
-            }
-        } else {
-            switch keyCode {
-            case 49: index = min(5, choices.count - 1)       // Space
-            case 36, 76: index = min(4, choices.count - 1)  // Return / keypad Enter
-            case 51, 117: index = min(3, choices.count - 1) // Delete
-            default: index = Int.random(in: 0..<min(3, choices.count))
-            }
+        switch keyCode {
+        case 49: index = min(5, choices.count - 1)       // Space
+        case 36, 76: index = min(4, choices.count - 1)  // Return / keypad Enter
+        case 51, 117: index = min(3, choices.count - 1) // Delete
+        default: index = Int.random(in: 0..<min(3, choices.count))
         }
         player.stop()
         player.scheduleBuffer(choices[index], at: nil, options: .interrupts)
@@ -201,7 +191,15 @@ final class SoundEngine {
         }
         let allNames = bank.keys.sorted()
         let preferred: [String]
-        if profile == .typewriterReal {
+        if profile == .pain {
+            switch keyCode {
+            case 36, 76: preferred = allNames.filter { $0.hasPrefix("enter-") }
+            case 49: preferred = allNames.filter { $0.hasPrefix("space-") }
+            case 51, 117: preferred = allNames.filter { $0.hasPrefix("delete-") }
+            case 56, 60, 57: preferred = allNames.filter { $0.hasPrefix("shift-") }
+            default: preferred = allNames.filter { $0.hasPrefix("key-") }
+            }
+        } else if profile == .typewriterReal {
             switch keyCode {
             case 49: preferred = allNames.filter { $0.lowercased().contains("space") }
             case 36, 76: preferred = allNames.filter { $0.lowercased().contains("return") }
@@ -235,15 +233,13 @@ final class SoundEngine {
     private func makeBuffer(profile: SoundProfile, variation: Int) -> AVAudioPCMBuffer? {
         let duration: Double
         switch profile {
-        case .mechanicalReal, .typewriterReal: return nil
+        case .mechanicalReal, .typewriterReal, .pain: return nil
         case .butterfly: duration = variation == 5 ? 0.070 : 0.048
         case .thock: duration = 0.105
         case .clicky: duration = 0.055
         case .creamy: duration = 0.085
         case .typewriter: duration = 0.075
         case .soft: duration = 0.050
-        case .pain:
-            duration = variation >= 6 ? 0.52 : (variation == 3 ? 0.28 : 0.18)
         }
         let count = AVAudioFrameCount(duration * format.sampleRate)
         guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: count),
@@ -262,7 +258,7 @@ final class SoundEngine {
             let v = Double(variation) - 2.5
             let sample: Double
             switch profile {
-            case .mechanicalReal, .typewriterReal:
+            case .mechanicalReal, .typewriterReal, .pain:
                 sample = 0
             case .butterfly:
                 // Short, crisp, low-travel response inspired by Apple's butterfly keyboard.
@@ -294,34 +290,6 @@ final class SoundEngine {
             case .soft:
                 let body = sin(2 * .pi * (285 + v * 5) * t) * exp(-t * 75)
                 sample = body * 0.28 + Double(noise()) * exp(-t * 160) * 0.10
-            case .pain:
-                // Cartoon vocal synthesis: three formants create an "ow"-like sound.
-                // Enter uses longer, rising/falling variations for a dramatic scream.
-                let isScream = variation >= 6
-                let base: Double
-                if isScream {
-                    let progress = t / max(duration, 0.001)
-                    base = (variation == 6 ? 230 : variation == 7 ? 285 : 340)
-                        + sin(progress * .pi) * 170
-                } else if variation == 3 {
-                    base = 92 + sin(t * 18) * 8
-                } else if variation == 4 {
-                    base = max(95, 210 - t * 420)
-                } else if variation == 5 {
-                    base = 390 - t * 250
-                } else {
-                    base = 190 + Double(variation) * 48 - t * 120
-                }
-                let envelope = isScream
-                    ? min(1, t * 28) * exp(-t * 2.8)
-                    : min(1, t * 55) * exp(-t * 12)
-                let vibrato = isScream ? sin(2 * .pi * 7.2 * t) * 8 : 0
-                let phase = 2 * .pi * (base + vibrato) * t
-                let voice = sin(phase) * 0.52
-                    + sin(phase * 2.15) * 0.25
-                    + sin(phase * 3.7) * 0.12
-                let breath = Double(noise()) * (isScream ? 0.10 : 0.04)
-                sample = (voice + breath) * envelope
             }
             let attack = min(1.0, t * 2_800)
             channel[i] = Float(max(-1, min(1, sample * attack)))

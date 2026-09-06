@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1 — 2026-09-06
+
+- Replaced the synthesized Pain Mode tones with 15 real human vocal recordings.
+- Added dedicated reactions for regular keys, Space, Delete, Shift/Caps Lock, and three screams for Enter.
+- Added CC0 attribution for the new recordings.
+
 ## 1.4 — 2026-09-06
 
 - Added Pain Mode under the new Fun Lab section.

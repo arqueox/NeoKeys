@@ -20,7 +20,7 @@ NeoKeys is a small native macOS menu bar app that plays recordings of physical k
 - **Cherry Real:** 12 recordings of physical key presses
 - **Real Typewriter:** distinct sounds for regular keys, Space, Return, and Backspace
 - Additional Butterfly, Thock, Clicky, Creamy, Typewriter, and Soft profiles
-- **Pain Mode (Fun Lab):** cartoon groans on every key and a dramatic scream on Enter
+- **Pain Mode (Fun Lab):** real human vocal reactions on every key and three dramatic screams on Enter
 - Overlapping playback that keeps up with fast typing
 - Persistent sound profile, volume, and enabled state
 - Optional launch at login
@@ -28,7 +28,7 @@ NeoKeys is a small native macOS menu bar app that plays recordings of physical k
 
 ### Fun Lab
 
-Pain Mode is an intentionally silly, family-friendly sound profile. Regular keys produce varied cartoon "ow" sounds, Space groans, Delete sighs, and Enter screams dramatically. Its session-only counters track `Keys hurt`, `Enters traumatized`, and the keyboard's fictional wellbeing. No key content or counters are stored.
+Pain Mode is an intentionally silly sound profile built from short CC0 human vocal recordings. Regular keys produce varied pain reactions, Space groans, Delete protests, and Enter chooses one of three longer screams. Its session-only counters track `Keys hurt`, `Enters traumatized`, and the keyboard's fictional wellbeing. No key content or counters are stored.
 
 > Every key suffers. Enter screams the loudest. **Support your keys. Type gently.**
 
