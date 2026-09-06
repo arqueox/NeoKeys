@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4 — 2026-09-06
+
+- Added Pain Mode under the new Fun Lab section.
+- Added varied cartoon vocal effects for normal keys, Space, Delete, Shift, and Caps Lock.
+- Added a dramatic randomized scream for Return and keypad Enter.
+- Added session-only `Keys hurt`, `Enters traumatized`, and `Keyboard wellbeing` counters.
+- Added the `Support the Keys` interaction and campaign tagline.
+- Kept all effects synthesized locally, with no voice files, analytics, or stored keystrokes.
+
 ## 1.3 — 2026-09-06
 
 - Added real Cherry KC 1000 keyboard recordings.

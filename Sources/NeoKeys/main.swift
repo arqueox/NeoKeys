@@ -86,6 +86,7 @@ enum SoundProfile: String, CaseIterable {
     case creamy = "Creamy"
     case typewriter = "Typewriter"
     case soft = "Soft"
+    case pain = "Pain Mode"
 
     var symbol: String {
         switch self {
@@ -97,6 +98,7 @@ enum SoundProfile: String, CaseIterable {
         case .creamy: return "drop.fill"
         case .typewriter: return "keyboard"
         case .soft: return "cloud.fill"
+        case .pain: return "bolt.heart.fill"
         }
     }
 
@@ -128,7 +130,8 @@ final class SoundEngine {
             players.append(player)
         }
         for profile in SoundProfile.allCases where !profile.isRecorded {
-            buffers[profile] = (0..<6).compactMap { makeBuffer(profile: profile, variation: $0) }
+            let variationCount = profile == .pain ? 9 : 6
+            buffers[profile] = (0..<variationCount).compactMap { makeBuffer(profile: profile, variation: $0) }
         }
         loadRecordedProfile(.mechanicalReal, folder: "Mechanical")
         loadRecordedProfile(.typewriterReal, folder: "Typewriter")
@@ -152,11 +155,21 @@ final class SoundEngine {
         let player = players[nextPlayer]
         nextPlayer = (nextPlayer + 1) % players.count
         let index: Int
-        switch keyCode {
-        case 49: index = min(5, choices.count - 1)       // Space
-        case 36, 76: index = min(4, choices.count - 1)  // Return / keypad Enter
-        case 51, 117: index = min(3, choices.count - 1) // Delete
-        default: index = Int.random(in: 0..<min(3, choices.count))
+        if profile == .pain {
+            switch keyCode {
+            case 36, 76: index = Int.random(in: 6..<min(9, choices.count)) // Return / keypad Enter: scream
+            case 49: index = min(3, choices.count - 1)                    // Space: low groan
+            case 51, 117: index = min(4, choices.count - 1)               // Delete: relieved sigh
+            case 56, 60, 57: index = min(5, choices.count - 1)            // Shift / Caps Lock: protest
+            default: index = Int.random(in: 0..<min(3, choices.count))    // Small, varied "ow"
+            }
+        } else {
+            switch keyCode {
+            case 49: index = min(5, choices.count - 1)       // Space
+            case 36, 76: index = min(4, choices.count - 1)  // Return / keypad Enter
+            case 51, 117: index = min(3, choices.count - 1) // Delete
+            default: index = Int.random(in: 0..<min(3, choices.count))
+            }
         }
         player.stop()
         player.scheduleBuffer(choices[index], at: nil, options: .interrupts)
@@ -229,6 +242,8 @@ final class SoundEngine {
         case .creamy: duration = 0.085
         case .typewriter: duration = 0.075
         case .soft: duration = 0.050
+        case .pain:
+            duration = variation >= 6 ? 0.52 : (variation == 3 ? 0.28 : 0.18)
         }
         let count = AVAudioFrameCount(duration * format.sampleRate)
         guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: count),
@@ -279,6 +294,34 @@ final class SoundEngine {
             case .soft:
                 let body = sin(2 * .pi * (285 + v * 5) * t) * exp(-t * 75)
                 sample = body * 0.28 + Double(noise()) * exp(-t * 160) * 0.10
+            case .pain:
+                // Cartoon vocal synthesis: three formants create an "ow"-like sound.
+                // Enter uses longer, rising/falling variations for a dramatic scream.
+                let isScream = variation >= 6
+                let base: Double
+                if isScream {
+                    let progress = t / max(duration, 0.001)
+                    base = (variation == 6 ? 230 : variation == 7 ? 285 : 340)
+                        + sin(progress * .pi) * 170
+                } else if variation == 3 {
+                    base = 92 + sin(t * 18) * 8
+                } else if variation == 4 {
+                    base = max(95, 210 - t * 420)
+                } else if variation == 5 {
+                    base = 390 - t * 250
+                } else {
+                    base = 190 + Double(variation) * 48 - t * 120
+                }
+                let envelope = isScream
+                    ? min(1, t * 28) * exp(-t * 2.8)
+                    : min(1, t * 55) * exp(-t * 12)
+                let vibrato = isScream ? sin(2 * .pi * 7.2 * t) * 8 : 0
+                let phase = 2 * .pi * (base + vibrato) * t
+                let voice = sin(phase) * 0.52
+                    + sin(phase * 2.15) * 0.25
+                    + sin(phase * 3.7) * 0.12
+                let breath = Double(noise()) * (isScream ? 0.10 : 0.04)
+                sample = (voice + breath) * envelope
             }
             let attack = min(1.0, t * 2_800)
             channel[i] = Float(max(-1, min(1, sample * attack)))
@@ -296,6 +339,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var enabled = true
     private var profile: SoundProfile = .thock
     private var volume: Float = 0.55
+    private var painKeyCount = 0
+    private var traumatizedEnterCount = 0
+    private weak var painKeysItem: NSMenuItem?
+    private weak var painEntersItem: NSMenuItem?
+    private weak var painWellbeingItem: NSMenuItem?
 
     private var isMacBookNeo: Bool {
         var size = 0
@@ -342,7 +390,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let monitor = KeyboardMonitor { [weak self] keyCode, isRepeat in
             DispatchQueue.main.async {
                 guard let self, self.enabled, !isRepeat else { return }
-                self.soundEngine.play(profile: self.profile, keyCode: keyCode)
+                let played = self.soundEngine.play(profile: self.profile, keyCode: keyCode)
+                if played, self.profile == .pain { self.recordPain(for: keyCode) }
             }
         }
         keyboardMonitor = monitor
@@ -365,6 +414,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let profiles = NSMenuItem(title: "Perfil sonoro", action: nil, keyEquivalent: "")
         let profileMenu = NSMenu()
         for option in SoundProfile.allCases {
+            if option == .pain {
+                profileMenu.addItem(.separator())
+                let funTitle = NSMenuItem(title: "Fun Lab", action: nil, keyEquivalent: "")
+                funTitle.isEnabled = false
+                profileMenu.addItem(funTitle)
+            }
             let item = NSMenuItem(title: option.rawValue, action: #selector(selectProfile(_:)), keyEquivalent: "")
             item.target = self
             item.representedObject = option.rawValue
@@ -391,6 +446,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         testSound.target = self
         testSound.image = NSImage(systemSymbolName: "play.circle", accessibilityDescription: nil)
         menu.addItem(testSound)
+
+        if profile == .pain {
+            menu.addItem(.separator())
+            let tagline = NSMenuItem(title: "Every key suffers. Enter screams the loudest.", action: nil, keyEquivalent: "")
+            tagline.isEnabled = false
+            menu.addItem(tagline)
+
+            let keys = NSMenuItem(title: painKeysTitle, action: nil, keyEquivalent: "")
+            keys.isEnabled = false
+            painKeysItem = keys
+            menu.addItem(keys)
+
+            let enters = NSMenuItem(title: painEntersTitle, action: nil, keyEquivalent: "")
+            enters.isEnabled = false
+            painEntersItem = enters
+            menu.addItem(enters)
+
+            let wellbeing = NSMenuItem(title: painWellbeingTitle, action: nil, keyEquivalent: "")
+            wellbeing.isEnabled = false
+            painWellbeingItem = wellbeing
+            menu.addItem(wellbeing)
+
+            let support = NSMenuItem(title: "❤️ Support the Keys", action: #selector(supportTheKeys), keyEquivalent: "")
+            support.target = self
+            menu.addItem(support)
+        } else {
+            painKeysItem = nil
+            painEntersItem = nil
+            painWellbeingItem = nil
+        }
         menu.addItem(.separator())
 
         if !CGPreflightListenEventAccess() {
@@ -445,13 +530,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func testSound() {
-        if !soundEngine.play(profile: profile, keyCode: 49) {
+        let testKeyCode: UInt16 = profile == .pain ? 36 : 49
+        if !soundEngine.play(profile: profile, keyCode: testKeyCode) {
             let alert = NSAlert()
             alert.alertStyle = .warning
             alert.messageText = "Não foi possível reproduzir o som"
             alert.informativeText = soundEngine.lastError ?? "Verifique a saída de áudio selecionada nas Definições do Sistema."
             alert.runModal()
         }
+    }
+
+    private var painKeysTitle: String { "Keys hurt this session: \(painKeyCount)" }
+    private var painEntersTitle: String { "Enters traumatized: \(traumatizedEnterCount)" }
+
+    private var painWellbeingTitle: String {
+        let state: String
+        switch painKeyCount {
+        case 0..<25: state = "Stable"
+        case 25..<100: state = "Concerned"
+        case 100..<250: state = "Distressed"
+        default: state = "Critical"
+        }
+        return "Keyboard wellbeing: \(state)"
+    }
+
+    private func recordPain(for keyCode: UInt16) {
+        painKeyCount += 1
+        if keyCode == 36 || keyCode == 76 { traumatizedEnterCount += 1 }
+        painKeysItem?.title = painKeysTitle
+        painEntersItem?.title = painEntersTitle
+        painWellbeingItem?.title = painWellbeingTitle
+    }
+
+    @objc private func supportTheKeys() {
+        let alert = NSAlert()
+        alert.messageText = "Thank you…"
+        alert.informativeText = "The keys feel seen. Type gently."
+        alert.addButton(withTitle: "I support the keys")
+        alert.runModal()
     }
 
     @objc private func requestPermission() {
