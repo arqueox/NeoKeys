@@ -1,5 +1,13 @@
 # Sound recordings and licenses
 
+## Fart Mode
+
+Nine excerpts from **Gastric Distress**, created by LFA.
+
+- Source: https://opengameart.org/content/gastric-distress
+- License: CC0 1.0 / Public Domain
+- Changes: the source WAV was divided into individual effects, normalized, converted to mono 44.1 kHz WAV, and renamed by keyboard action.
+
 ## Pain Mode
 
 Fifteen human vocal strain, hurt, pain, and jump recordings from **15 vocal male strain/hurt/pain/jump sounds**, recorded by qubodup.

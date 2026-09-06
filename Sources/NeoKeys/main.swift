@@ -87,6 +87,7 @@ enum SoundProfile: String, CaseIterable {
     case typewriter = "Typewriter"
     case soft = "Soft"
     case pain = "Pain Mode"
+    case fart = "Fart Mode"
 
     var symbol: String {
         switch self {
@@ -99,11 +100,12 @@ enum SoundProfile: String, CaseIterable {
         case .typewriter: return "keyboard"
         case .soft: return "cloud.fill"
         case .pain: return "bolt.heart.fill"
+        case .fart: return "wind"
         }
     }
 
     var isRecorded: Bool {
-        self == .mechanicalReal || self == .typewriterReal || self == .pain
+        self == .mechanicalReal || self == .typewriterReal || self == .pain || self == .fart
     }
 }
 
@@ -135,6 +137,7 @@ final class SoundEngine {
         loadRecordedProfile(.mechanicalReal, folder: "Mechanical")
         loadRecordedProfile(.typewriterReal, folder: "Typewriter")
         loadRecordedProfile(.pain, folder: "Pain")
+        loadRecordedProfile(.fart, folder: "Fart")
         engine.prepare()
         startEngine()
     }
@@ -191,7 +194,12 @@ final class SoundEngine {
         }
         let allNames = bank.keys.sorted()
         let preferred: [String]
-        if profile == .pain {
+        if profile == .fart {
+            switch keyCode {
+            case 36, 76: preferred = allNames.filter { $0.hasPrefix("enter-") }
+            default: preferred = allNames.filter { $0.hasPrefix("key-") }
+            }
+        } else if profile == .pain {
             switch keyCode {
             case 36, 76: preferred = allNames.filter { $0.hasPrefix("enter-") }
             case 49: preferred = allNames.filter { $0.hasPrefix("space-") }
@@ -233,7 +241,7 @@ final class SoundEngine {
     private func makeBuffer(profile: SoundProfile, variation: Int) -> AVAudioPCMBuffer? {
         let duration: Double
         switch profile {
-        case .mechanicalReal, .typewriterReal, .pain: return nil
+        case .mechanicalReal, .typewriterReal, .pain, .fart: return nil
         case .butterfly: duration = variation == 5 ? 0.070 : 0.048
         case .thock: duration = 0.105
         case .clicky: duration = 0.055
@@ -258,7 +266,7 @@ final class SoundEngine {
             let v = Double(variation) - 2.5
             let sample: Double
             switch profile {
-            case .mechanicalReal, .typewriterReal, .pain:
+            case .mechanicalReal, .typewriterReal, .pain, .fart:
                 sample = 0
             case .butterfly:
                 // Short, crisp, low-travel response inspired by Apple's butterfly keyboard.
@@ -498,7 +506,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func testSound() {
-        let testKeyCode: UInt16 = profile == .pain ? 36 : 49
+        let testKeyCode: UInt16 = (profile == .pain || profile == .fart) ? 36 : 49
         if !soundEngine.play(profile: profile, keyCode: testKeyCode) {
             let alert = NSAlert()
             alert.alertStyle = .warning

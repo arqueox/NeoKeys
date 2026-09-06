@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5 — 2026-09-06
+
+- Added Fart Mode to Fun Lab with nine CC0 recorded effects.
+- Added six varied reactions for regular typing and three longer Enter effects.
+
 ## 1.4.1 — 2026-09-06
 
 - Replaced the synthesized Pain Mode tones with 15 real human vocal recordings.
